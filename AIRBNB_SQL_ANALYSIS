@@ -1,0 +1,143 @@
+/*Creating database*/
+Create database Amsterdam_AIRBNB;
+Use Amsterdam_AIRBNB; 
+
+/*Creating table*/
+Create table Listings
+( Id Integer,
+Name varchar(100),
+Host_Id Integer,
+Host_Nmae varchar(100),
+Host_since varchar(100),
+Neighbourhood varchar(100),
+Property_type varchar(100),
+Room_type varchar(100),
+Accomodates integer,
+Bedroom varchar(100),
+Beds integer,
+Price integer,
+Minimum_nights integer,
+availability_365 integer,
+number_of_reviews integer,
+calculated_host_listings_count integer,
+reviews_per_month varchar(100),
+review_scores_value integer
+);
+
+
+
+/*Adding a primary key constraint*/
+Alter Table listings
+Add constraint l_pk primary key(ID);
+
+/*Converting the garbage values back to null*/
+
+Update listings
+Set reviews_per_month=Null
+Where reviews_per_month="t";
+Update listings
+Set reviews_per_month=Null
+Where reviews_per_month="tt";
+Update listings
+Set Bedroom=Null
+Where Bedroom="tt";
+ Update listings
+Set Bedroom=Null
+Where Bedroom="t";
+
+Update listings
+Set host_name=null
+Where host_name="tt";
+Update listings
+Set host_name=null
+Where host_name="t";
+ 
+Update listings
+Set name=null
+Where name="t";
+Update listings
+Set name=null
+Where name="tt";
+
+/* Rename a columnn*/
+
+Alter table listings
+Rename column Host_Nmae to Host_name;
+
+/*Modifying the data type of colums*/
+
+Alter Table listings
+Modify column Bedroom Integer;
+
+Alter Table listings
+Modify column reviews_per_month Integer;
+
+/*Converting the date to date data type*/
+Alter Table listings
+ADD Column New_Host_since Date;
+
+SELECT Name, Str_To_Date(Host_since, "%d-%m-%Y")
+FROM listings;
+
+Update listings 
+SET New_Host_since = Str_To_Date(Host_since,"%d-%m-%Y");
+Select count(*) from listings;
+/*Dropping a column*/
+Alter table listings
+Drop column  Host_since;
+
+/*SHowing the popularity of a neighbourhood*/
+Select neighbourhood,count(neighbourhood) as popular_neighbourhood
+from listings
+Group By neighbourhood
+Order by count(Neighbourhood) desc;
+
+/*Showing expensive neighbourhood on the basis of average price*/
+Select Neighbourhood,avg(Price) as avg_price
+From listings
+Group by neighbourhood
+Order By 2 desc;
+
+
+
+/*Display the hostname and their total listings*/
+Select host_name,calculated_host_listings_count
+From listings
+Group By host_name
+Order by 2 desc;
+
+/*Year_wise joining of hosts*/
+Select Year(New_host_since),count(Distinct Host_name) as No_of_hosts
+from listings
+group by Year(New_host_since);
+
+/*Showing  average earnings host-wise*/
+Select Host_name,avg(Price* number_of_reviews) as earnings
+From listings
+group by Host_name
+Order by 2 desc;
+
+/* Showing  relation between average price and room_type*/
+Select room_type,avg(price) as avg_price
+From listings 
+group by room_type
+order by 2 asc;
+
+/*Showing the maximum number of  beds*/
+Select Property_Type,count(beds) as no_of_beds
+from listings
+group by Property_type
+Order by 2 DESC;
+
+/*Most demanding property_type*/
+Select property_type,Count(Property_type) as Desired_Property_Type
+FRom listings
+Group by Property_type
+Order by 2 desc;
+
+
+/*TOP 10 Properties based on review scores*/
+Select id,name,review_scores_value
+From listings
+Order by 3 desc
+Limit 10;
